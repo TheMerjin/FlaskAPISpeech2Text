@@ -1,8 +1,9 @@
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Allows Astro frontend to talk to Flask
+CORS(app)
 
 
 @app.route("/")
@@ -17,4 +18,5 @@ def echo():
 
 
 if __name__ == "__main__":
-    app.run()
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
