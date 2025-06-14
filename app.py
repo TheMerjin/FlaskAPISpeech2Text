@@ -5,7 +5,7 @@ import json
 import os
 
 app = Flask(__name__)
-model = Model(r"/model/vosk-model-small-en-us-0.15")  # path to vosk model directory
+model = Model(r"model/vosk-model-small-en-us-0.15")  # path to vosk model directory
 
 
 @app.route("/transcribe", methods=["POST"])
