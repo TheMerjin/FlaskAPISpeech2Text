@@ -3,13 +3,19 @@ from vosk import Model, KaldiRecognizer
 import wave
 import json
 import os
+from flask_cors import CORS
 
 app = Flask(__name__)
 model = Model(r"model/vosk-model-small-en-us-0.15")  # path to vosk model directory
 
+CORS(app)
+
+
 @app.route("/", methods=["GET"])
 def index():
     return "<h2>Speech to Text API is Running! POST a .wav file to /transcribe</h2>"
+
+
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
     if "file" not in request.files:
