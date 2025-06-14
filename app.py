@@ -5,14 +5,15 @@ import json
 import os
 
 app = Flask(__name__)
-model = Model("model")  # path to vosk model directory
+model = Model(r"/model/vosk-model-small-en-us-0.15")  # path to vosk model directory
 
-@app.route('/transcribe', methods=['POST'])
+
+@app.route("/transcribe", methods=["POST"])
 def transcribe():
-    if 'file' not in request.files:
+    if "file" not in request.files:
         return jsonify({"error": "No audio file uploaded"}), 400
 
-    audio_file = request.files['file']
+    audio_file = request.files["file"]
     audio_path = "temp.wav"
     audio_file.save(audio_path)
 
@@ -31,6 +32,7 @@ def transcribe():
     os.remove(audio_path)
     text = " ".join(r.get("text", "") for r in results)
     return jsonify({"transcription": text})
+
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
