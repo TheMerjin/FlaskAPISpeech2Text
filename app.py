@@ -18,12 +18,14 @@ def index():
 
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
+    print("POST CALLED")
     if "file" not in request.files:
         return jsonify({"error": "No audio file uploaded"}), 400
 
     audio_file = request.files["file"]
     audio_path = "temp.wav"
     audio_file.save(audio_path)
+    print("SAVED")
 
     wf = wave.open(audio_path, "rb")
     rec = KaldiRecognizer(model, wf.getframerate())
