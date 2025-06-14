@@ -1,21 +1,36 @@
-import os
 from flask import Flask, request, jsonify
-from flask_cors import CORS
+from vosk import Model, KaldiRecognizer
+import wave
+import json
+import os
 
 app = Flask(__name__)
-CORS(app)
+model = Model("model")  # path to vosk model directory
 
+@app.route('/transcribe', methods=['POST'])
+def transcribe():
+    if 'file' not in request.files:
+        return jsonify({"error": "No audio file uploaded"}), 400
 
-@app.route("/")
-def home():
-    return "Hello from Flask!"
+    audio_file = request.files['file']
+    audio_path = "temp.wav"
+    audio_file.save(audio_path)
 
+    wf = wave.open(audio_path, "rb")
+    rec = KaldiRecognizer(model, wf.getframerate())
 
-@app.route("/api/echo", methods=["POST"])
-def echo():
-    data = request.json
-    return jsonify({"you_said": data.get("message", "")})
+    results = []
+    while True:
+        data = wf.readframes(4000)
+        if len(data) == 0:
+            break
+        if rec.AcceptWaveform(data):
+            results.append(json.loads(rec.Result()))
+    results.append(json.loads(rec.FinalResult()))
 
+    os.remove(audio_path)
+    text = " ".join(r.get("text", "") for r in results)
+    return jsonify({"transcription": text})
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
